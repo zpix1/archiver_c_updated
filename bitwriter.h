@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 1000
+#define BW_BUFFER_SIZE 1000
 
 typedef struct BitWriter {
     FILE* f;
@@ -16,7 +16,7 @@ typedef struct BitWriter {
 // f should be opened in binary writing mode
 BitWriter* BitWriter__new(FILE* f);
 
-inline void BitWriter__write_bit(BitWriter* bw, char* bit);
+void BitWriter__write_bit(BitWriter* bw, char bit);
 
 void BitWriter__write_buffer(BitWriter* bw);
 
