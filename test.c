@@ -49,13 +49,21 @@ int main() {
     FILE* f = fopen("infile.txt", "rb");
     FILE* of = fopen("outfile.txt", "wb");
 
-    const int infile_size = 200;
+    const int infile_size = 27414;
 
     printf("[TEST] Generating code tree\n");
     FreqNode* head = generate_code_tree(f, infile_size);
     printf("[TEST] Encoding data\n");
     encode_data(head, f, infile_size, of);
-    printf("%d\n", head->freq);
+
+    fclose(f);
+    fclose(of);
+
+    FILE* f1 = fopen("outfile.txt", "rb");
+    FILE* of1 = fopen("infile_dec.txt", "wb");
+
+    decode_data(head, f1, infile_size, of1);
+
     free_tree(head);
     return 0;
 }

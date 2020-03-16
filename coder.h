@@ -36,5 +36,8 @@ void free_tree(FreqNode* head);
 // Generate freq_tree and return the caret to the original state
 FreqNode* generate_code_tree(FILE* infile, size_t size);
 
-// Encode and write size bytes from infile to outfile and don't change caret state
+// Encode and write size bytes from infile to outfile
 void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile);
+
+// Decode and write size bytes from infile to outfile
+void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile);

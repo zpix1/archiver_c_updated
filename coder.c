@@ -3,7 +3,7 @@
 #include "coder.h"
 #include "pq.h"
 #include "bitwriter.h"
-
+#include "bitreader.h"
 
 int min(int a, int b) {
     return a < b ? a : b;
@@ -55,14 +55,10 @@ FreqNode* generate_code_tree(FILE* infile, size_t size) {
             FreqNode* new_node = malloc(sizeof(FreqNode));
             new_node->zero_node = pop(h);
             new_node->one_node = pop(h);
-
-            PRINT_FN(new_node->zero_node);
-            PRINT_FN(new_node->one_node);
             
             new_node->freq = new_node->one_node->freq + new_node->zero_node->freq;
             new_node->c = 0;
             push(h, new_node->freq, new_node);
-            PRINT_FN(new_node);
             counter--;
         }
         ans = pop(h);
@@ -70,7 +66,9 @@ FreqNode* generate_code_tree(FILE* infile, size_t size) {
 
     free(arr);
     free(buffer);
+    free(h->nodes);
     free(h);
+
     return ans;
 }
 
@@ -83,7 +81,6 @@ void free_tree(FreqNode* head) {
 }
 
 void fill_code_table(CharCode* code_table, FreqNode* node, CharCode current_code) {
-    PRINT_FN(node);
     if (node->one_node != NULL) {
         CharCode c;
         c.code_length = current_code.code_length + 1;
@@ -109,10 +106,13 @@ void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
     }
     CharCode c = {.code_length = 0, .code = 0};
     fill_code_table(code_table, freq_tree, c);
+
+    printf("[TEST] Code table:\n");
     for (int i = 0; i < BYTE_COUNT; i++) {
         if (code_table[i].code_length != 0)
-        printf("%c: " BYTE_TO_BINARY_PATTERN "; %d\n", i, BYTE_TO_BINARY(code_table[i].code), code_table[i].code_length);
+        printf("char=%c: code=" BYTE_TO_BINARY_PATTERN "; code_len=%d\n", i, BYTE_TO_BINARY(code_table[i].code), code_table[i].code_length);
     }
+
     unsigned char* buffer = malloc(sizeof(char) * C_BUFFER_SIZE);
     int to_read = size;
     int read = 0;
@@ -131,4 +131,43 @@ void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
     BitWriter__destroy(bw);
     free(buffer);
     free(code_table);
+}
+
+void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) {
+    BitReader* br = BitReader__new(infile);
+    unsigned char* buffer = malloc(sizeof(char) * C_BUFFER_SIZE);
+    int to_write = size;
+    int buffer_i = 0;
+    int counter = 0;
+
+    FreqNode* current_node = freq_tree;
+    while (counter < size) {
+        char bit = BitReader__read_bit(br);
+        if (bit == 0) {
+            current_node = current_node->zero_node;
+        } else if (bit == 1) {
+            current_node = current_node->one_node;
+        }
+        if (bit == -1) {
+            break;
+        }
+        if (current_node->one_node == NULL) {
+            buffer[buffer_i] = current_node->c;
+            current_node = freq_tree;
+            counter++;
+            buffer_i++;
+            if (buffer_i == min(to_write, C_BUFFER_SIZE)) {
+                to_write -= buffer_i;
+                fwrite(buffer, sizeof(char), buffer_i, outfile);
+                buffer_i = 0;
+            }
+        }
+    }
+
+    if (buffer_i != 0) {
+        fwrite(buffer, sizeof(char), min(buffer_i, to_write), outfile);
+    }
+    
+    free(buffer);
+    BitReader__destroy(br);
 }
