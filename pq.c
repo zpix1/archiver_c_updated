@@ -71,7 +71,7 @@ static void heapify(struct priority_queue* pq, size_t i) {
     if (current != i) { 
         swap_ranges(get_element(pq, i), get_element(pq, current), pq->size);
         heapify(pq, current); 
-    } 
+    }
 } 
 
 void* pq_pop(struct priority_queue* pq) {
@@ -81,12 +81,12 @@ void* pq_pop(struct priority_queue* pq) {
     if (pq->n_items == 0) {
         return NULL;
     }
-    if (pq->n_items * pq->size * GROWTH_RATE < pq->_allocated_size) {
-        void* tmp = realloc(pq->base, (pq->n_items + 1) * pq->size);
-        if (tmp == NULL) return NULL;
-        pq->base = tmp;
-        pq->_allocated_size = (pq->n_items + 1) * pq->size;
-    }
+    // if (pq->n_items * pq->size * GROWTH_RATE < pq->_allocated_size) {
+    //     void* tmp = realloc(pq->base, (pq->n_items + 1) * pq->size);
+    //     if (tmp == NULL) return NULL;
+    //     pq->base = tmp;
+    //     pq->_allocated_size = (pq->n_items + 1) * pq->size;
+    // }
     pq->n_items--;
     
     swap_ranges(get_element(pq, 0), get_element(pq, pq->n_items), pq->size);

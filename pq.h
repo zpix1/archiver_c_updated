@@ -1,8 +1,8 @@
 #pragma once
 #include <stdlib.h>
 
-#define INITIAL_SIZE 100
-#define GROWTH_RATE 2
+#define INITIAL_SIZE 1000
+#define GROWTH_RATE 1
 
 // Priority Queue
 // n_items - the number of elements

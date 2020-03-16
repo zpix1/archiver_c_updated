@@ -47,7 +47,15 @@ void test_bw_br() {
 
 int main() {
     FILE* f = fopen("infile.txt", "rb");
-    FreqNode* head = generate_code_tree(f, 6);
-    printf("freq_node = %d, %c\n", head->freq, head->c);
+    FILE* of = fopen("outfile.txt", "wb");
+
+    const int infile_size = 200;
+
+    printf("[TEST] Generating code tree\n");
+    FreqNode* head = generate_code_tree(f, infile_size);
+    printf("[TEST] Encoding data\n");
+    encode_data(head, f, infile_size, of);
+    printf("%d\n", head->freq);
+    free_tree(head);
     return 0;
 }
