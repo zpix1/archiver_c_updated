@@ -16,4 +16,6 @@ int pack_files(char** filenames, size_t nfilenames, char* outfilename);
 int unpack_files(char* infilename, char* outdir);
 
 // Compress and write infile to given position of outfile
-int pack_file(FILE* outfile, FILE* infile, size_t position);
+int pack_file(FILE* infile, FILE* outfile);
+
+int unpack_file(FILE* infile, FILE* outfile);

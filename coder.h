@@ -41,3 +41,7 @@ void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile);
 
 // Decode and write size bytes from infile to outfile
 void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile);
+
+void write_tree(FreqNode* freq_tree, FILE* infile);
+
+FreqNode* read_tree(FILE* fp);

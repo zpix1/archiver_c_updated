@@ -49,7 +49,7 @@ int main() {
     FILE* f = fopen("infile.txt", "rb");
     FILE* of = fopen("outfile.txt", "wb");
 
-    const int infile_size = 27414;
+    const int infile_size = 78;
 
     printf("[TEST] Generating code tree\n");
     FreqNode* head = generate_code_tree(f, infile_size);
