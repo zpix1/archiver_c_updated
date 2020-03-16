@@ -4,9 +4,6 @@
 #include "pq.h"
 #include "bitwriter.h"
 
-int reversed_cmp_freq_node(const void* a, const void* b) {
-    return -(((FreqNode*)a)->freq - ((FreqNode*)b)->freq);
-}
 
 int min(int a, int b) {
     return a < b ? a : b;
@@ -38,12 +35,12 @@ FreqNode* generate_code_tree(FILE* infile, size_t size) {
     // To count different nodes
     int counter = 0;
 
-    priority_queue* pq = create_pq(sizeof(FreqNode*), reversed_cmp_freq_node);
+    heap_t *h = calloc(1, sizeof(heap_t));
 
     for (size_t i = 0; i < BYTE_COUNT; i++) {
         if (arr[i]->freq != 0) {
             counter++;
-            pq_add(pq, &arr[i]);
+            push(h, arr[i]->freq, arr[i]);
         } else {
             free(arr[i]);
         }
@@ -52,29 +49,28 @@ FreqNode* generate_code_tree(FILE* infile, size_t size) {
     FreqNode *ans;
     // Special case of one element
     if (counter == 1) {
-        ans = *((FreqNode**)pq_pop(pq));
+        ans = pop(h);
     } else {
-        while (pq->n_items != 1) {
+        while (h->len != 1) {
             FreqNode* new_node = malloc(sizeof(FreqNode));
-            new_node->zero_node = *((FreqNode**)pq_pop(pq));
-            new_node->one_node = *((FreqNode**)pq_pop(pq));
+            new_node->zero_node = pop(h);
+            new_node->one_node = pop(h);
 
             PRINT_FN(new_node->zero_node);
             PRINT_FN(new_node->one_node);
             
             new_node->freq = new_node->one_node->freq + new_node->zero_node->freq;
             new_node->c = 0;
-            pq_add(pq, &new_node);
+            push(h, new_node->freq, new_node);
             PRINT_FN(new_node);
             counter--;
         }
-        ans = *((FreqNode**)pq_pop(pq));
+        ans = pop(h);
     }
 
     free(arr);
     free(buffer);
-    delete_pq(pq);
-
+    free(h);
     return ans;
 }
 

@@ -1,34 +1,19 @@
-#pragma once
+
+#include <stdio.h>
 #include <stdlib.h>
 
-#define INITIAL_SIZE 1000
-#define GROWTH_RATE 1
+#include "coder.h"
 
-// Priority Queue
-// n_items - the number of elements
-// size - the size in bytes of each element
-// compar - the function that compares 2 elements
-// base - the pointer to the first element of array to be sorted
-// (stdlib qsort name style)
-typedef struct priority_queue {
-    size_t n_items;
-    size_t size;
-    size_t _allocated_size;
-    int (*compar)(const void *, const void*);
-    void* base;
-} priority_queue;
+typedef struct {
+    int priority;
+    FreqNode* data;
+} node_t;
 
-// Create a pq
-struct priority_queue* create_pq(size_t size, int (*compar)(const void *, const void*));
+typedef struct {
+    node_t* nodes;
+    int len;
+    int size;
+} heap_t;
 
-// Free given pq
-void delete_pq(struct priority_queue* pq);
-
-// Add an element to pq
-void pq_add(struct priority_queue* pq, void* element);
-
-// Remove element from pq, return pointer to it
-void* pq_pop(struct priority_queue* pq);
-
-// Sort given array using heapsort
-void myheapsort(void* base, size_t n_items, size_t size, int (*compar)(const void *, const void*));
+void push(heap_t* h, int priority, FreqNode* data);
+FreqNode* pop(heap_t* h);
