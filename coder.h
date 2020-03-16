@@ -4,7 +4,7 @@
 #define BYTE_COUNT 256
 #define C_BUFFER_SIZE 1000
 
-#define PRINT_FN(FN) printf("%20s: freq=%5d, c='%c',  zero=%p, one=%p\n", #FN,  FN->freq, FN->c, FN->zero_node, FN->one_node);
+#define PRINT_FN(FN) printf("%20s: freq=%5d, c='%c',  zero=%p, one=%p (%p)\n", #FN,  FN->freq, FN->c, FN->zero_node, FN->one_node, FN);
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)  \
   (byte & 0x80 ? '1' : '0'), \

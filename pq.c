@@ -91,7 +91,6 @@ void* pq_pop(struct priority_queue* pq) {
     
     swap_ranges(get_element(pq, 0), get_element(pq, pq->n_items), pq->size);
     heapify(pq, 0);
-
     return get_element(pq, pq->n_items);
 }
 

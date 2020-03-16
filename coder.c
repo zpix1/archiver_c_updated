@@ -1,10 +1,11 @@
 #include <string.h>
 
 #include "coder.h"
+#include "pq.h"
 #include "bitwriter.h"
 
 int reversed_cmp_freq_node(const void* a, const void* b) {
-    return -((((FreqNode*)a)->freq - ((FreqNode*)b)->freq));
+    return -(((FreqNode*)a)->freq - ((FreqNode*)b)->freq);
 }
 
 int min(int a, int b) {
@@ -37,11 +38,12 @@ FreqNode* generate_code_tree(FILE* infile, size_t size) {
     // To count different nodes
     int counter = 0;
 
-    qsort(arr, BYTE_COUNT, sizeof(FreqNode*), reversed_cmp_freq_node);
+    priority_queue* pq = create_pq(sizeof(FreqNode*), reversed_cmp_freq_node);
 
     for (size_t i = 0; i < BYTE_COUNT; i++) {
         if (arr[i]->freq != 0) {
             counter++;
+            pq_add(pq, &arr[i]);
         } else {
             free(arr[i]);
         }
@@ -71,6 +73,7 @@ FreqNode* generate_code_tree(FILE* infile, size_t size) {
 
     free(arr);
     free(buffer);
+    delete_pq(pq);
 
     return ans;
 }
