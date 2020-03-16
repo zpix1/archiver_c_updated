@@ -3,18 +3,22 @@
 
 #include "bitwriter.h"
 #include "bitreader.h"
+#include "coder.h"
 
 #define BWBR_TEST_SIZE 1000000
 
-int main() {
+void test_bw_br() {
     printf("[TEST] BitWriter test\n");
 
     FILE* f = fopen("text.bin", "wb");
     BitWriter* bw = BitWriter__new(f);
     int a[] = {1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1};
+    
+    printf("[TEST] BitWriter test start\n");
     for (int i = 0; i < BWBR_TEST_SIZE; i++) {
         BitWriter__write_bit(bw, a[i % (sizeof(a)/sizeof(int))]);
     }
+    printf("[TEST] BitWriter test end\n");
 
     BitWriter__write_buffer(bw);
     BitWriter__destroy(bw);
@@ -39,4 +43,11 @@ int main() {
 
     BitReader__destroy(br);
     fclose(f1);
+}
+
+int main() {
+    FILE* f = fopen("infile.txt", "rb");
+    FreqNode* head = generate_code_tree(f, 6);
+    printf("freq_node = %d, %c\n", head->freq, head->c);
+    return 0;
 }
