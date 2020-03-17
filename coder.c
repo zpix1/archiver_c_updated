@@ -80,13 +80,13 @@ void free_tree(FreqNode* head) {
 void fill_code_table(CharCode* code_table, FreqNode* node, CharCode current_code) {
     if (node->one_node != NULL) {
         CharCode c = current_code;
-        c.code[c.code_length] = '1';
+        c.code[(size_t)c.code_length] = '1';
         c.code_length = current_code.code_length + 1;
         fill_code_table(code_table, node->one_node, c);
     }
     if (node->zero_node != NULL) {
         CharCode c = current_code;
-        c.code[c.code_length] = '0';
+        c.code[(size_t)c.code_length] = '0';
         c.code_length = current_code.code_length + 1;
         fill_code_table(code_table, node->zero_node, c);
     }
@@ -104,11 +104,11 @@ void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
     CharCode c = { .code_length = 0 };
     fill_code_table(code_table, freq_tree, c);
 
-    fprintf(stderr, "[TEST] Code table:\n");
-    for (int i = 0; i < BYTE_COUNT; i++) {
-        if (code_table[i].code_length != 0)
-        fprintf(stderr, "char=%1c: code=%s; code_len=%d\n", i, code_table[i].code, code_table[i].code_length);
-    }
+    // fprintf(stderr, "[TEST] Code table:\n");
+    // for (int i = 0; i < BYTE_COUNT; i++) {
+    //     if (code_table[i].code_length != 0)
+    //     fprintf(stderr, "char=%1c: code=%s; code_len=%d\n", i, code_table[i].code, code_table[i].code_length);
+    // }
 
     unsigned char* buffer = malloc(sizeof(char) * C_BUFFER_SIZE);
     int to_read = size;
@@ -178,19 +178,13 @@ void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
 
 void write_tree(FreqNode* freq_tree, BitWriter* bw) {
     if (freq_tree == NULL) {
-        BitWriter__write_bit(bw, 0);
-        BitWriter__write_bit(bw, 0);
         return;
     }
 
-    // 0 - NULL, 1 - LEAF, 2 - NODE
-    char flag = (freq_tree->one_node == NULL ? 1 : 2);
+    char flag = (freq_tree->one_node == NULL ? 1 : 0);
 
-    BitWriter__write_bit(bw, (flag >> 1) & 1);
     BitWriter__write_bit(bw, flag & 1);
     
-
-    // If it is a leaf, save the value
     if (flag == 1) {
         for (int i = 0; i < 8; i++) {
             BitWriter__write_bit(bw, (freq_tree->c >> (7-i)) & 1);
@@ -207,13 +201,17 @@ FreqNode* read_tree(BitReader* br) {
     unsigned char flag;
 
     //fread(&flag, sizeof(char), 1, fp);
-    flag = (BitReader__read_bit(br) << 1) | BitReader__read_bit(br);
+    flag = BitReader__read_bit(br);
+    // if (is_null == 0) {
+    //     return NULL;
+    // } else {
+    //     flag = 2 | BitReader__read_bit(br);
+    // }
+    // flag = (BitReader__read_bit(br) << 1) | BitReader__read_bit(br);
     // printf("flag=%d\n", flag);
     // printf("flag=%d\n", BitReader__read_bit(br) );
     // printf("%d, %d \n", BitReader__read_bit(br), BitReader__read_bit(br));
-    if (flag == 0) {
-        return NULL;
-    } else if (flag == 1) {
+    if (flag == 1) {
         for (int i = 0; i < 8; i++) {
             value |= BitReader__read_bit(br) << (8 - i - 1);
         }
@@ -222,8 +220,12 @@ FreqNode* read_tree(BitReader* br) {
     FreqNode *root = malloc(sizeof(FreqNode));
     root->freq = 0;
     root->c = value;
-
-    root->zero_node = read_tree(br);
-    root->one_node = read_tree(br);
+    if (flag != 1) {
+        root->zero_node = read_tree(br);
+        root->one_node = read_tree(br);
+    } else {
+        root->zero_node = NULL;
+        root->one_node = NULL;
+    }
     return root;
 }
