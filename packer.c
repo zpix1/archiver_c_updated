@@ -14,10 +14,10 @@ unsigned long fsize(FILE* file) {
     return len;
 }
 
-int pack_file(FILE* infile, FILE* outfile, int infile_size) {
+int pack_file(FILE* infile, FILE* outfile, unsigned int infile_size) {
     FreqNode* tree = generate_code_tree(infile, infile_size);
 
-    fwrite(&infile_size, sizeof(int), 1, outfile);
+    fwrite(&infile_size, sizeof(unsigned int), 1, outfile);
 
     BitWriter* bw = BitWriter__new(outfile);
     write_tree(tree, bw);
@@ -26,12 +26,13 @@ int pack_file(FILE* infile, FILE* outfile, int infile_size) {
     encode_data(tree, infile, infile_size, outfile);
 
     free_tree(tree);
+
     return 0;
 }
 
 int unpack_file(FILE* infile, FILE* outfile) {
-    int infile_size;
-    fread(&infile_size, sizeof(int), 1, infile);
+    unsigned int infile_size;
+    fread(&infile_size, sizeof(unsigned int), 1, infile);
     
     BitReader* br = BitReader__new(infile);
     FreqNode* tree = read_tree(br);
@@ -39,5 +40,6 @@ int unpack_file(FILE* infile, FILE* outfile) {
     decode_data(tree, infile, infile_size, outfile);
 
     free_tree(tree);
+
     return 0;
 }

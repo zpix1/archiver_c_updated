@@ -3,7 +3,7 @@
 void push(heap_t* h, int priority, FreqNode* data) {
     if (h->len + 1 >= h->size) {
         h->size = h->size ? h->size * 2 : 4;
-        h->nodes = (node_t*)realloc(h->nodes, h->size * sizeof(node_t));
+        h->nodes = realloc(h->nodes, h->size * sizeof(node_t));
     }
     int i = h->len + 1;
     int j = i / 2;

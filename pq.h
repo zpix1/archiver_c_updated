@@ -15,5 +15,9 @@ typedef struct {
     int size;
 } heap_t;
 
+
+// PQ realisation was stolen and adapted for this project
+
 void push(heap_t* h, int priority, FreqNode* data);
+
 FreqNode* pop(heap_t* h);

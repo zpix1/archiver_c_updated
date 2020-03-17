@@ -10,19 +10,9 @@
 #define C_BUFFER_SIZE 1000
 
 #define PRINT_FN(FN) fprintf(stderr, "%20s: freq=%5d, c='%2d',  zero=%p, one=%p (%p)\n", #FN,  FN->freq, FN->c, FN->zero_node, FN->one_node, FN);
-#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
-#define BYTE_TO_BINARY(byte)  \
-  (byte & 0x80 ? '1' : '0'), \
-  (byte & 0x40 ? '1' : '0'), \
-  (byte & 0x20 ? '1' : '0'), \
-  (byte & 0x10 ? '1' : '0'), \
-  (byte & 0x08 ? '1' : '0'), \
-  (byte & 0x04 ? '1' : '0'), \
-  (byte & 0x02 ? '1' : '0'), \
-  (byte & 0x01 ? '1' : '0') 
 
 typedef struct FreqNode {
-    int freq;
+    unsigned int freq;
     unsigned char c;
 
     struct FreqNode* zero_node;
@@ -30,7 +20,7 @@ typedef struct FreqNode {
 } FreqNode;
 
 typedef struct CharCode {
-    char code_length;
+    unsigned char code_length;
     char code[255];
 } CharCode;
 
@@ -45,6 +35,8 @@ void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile);
 // Decode and write size bytes from infile to outfile
 void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile);
 
+// Write FreqNode tree to file using given BitWriter
 void write_tree(FreqNode* freq_tree, BitWriter* br);
 
+// Read FreqNode tree from file using given BitReader
 FreqNode* read_tree(BitReader* br);
