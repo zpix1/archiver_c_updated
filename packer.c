@@ -18,11 +18,12 @@ int pack_file(FILE* infile, FILE* outfile, int infile_size) {
     FreqNode* tree = generate_code_tree(infile, infile_size);
 
     fwrite(&infile_size, sizeof(int), 1, outfile);
+
     BitWriter* bw = BitWriter__new(outfile);
     write_tree(tree, bw);
     BitWriter__write_buffer(bw);
     BitWriter__destroy(bw);
-
+    fprintf(stderr, "f_pos = %d\n", ftell(outfile));
     encode_data(tree, infile, infile_size, outfile);
 
     free_tree(tree);
@@ -32,10 +33,14 @@ int pack_file(FILE* infile, FILE* outfile, int infile_size) {
 int unpack_file(FILE* infile, FILE* outfile) {
     int infile_size;
     fread(&infile_size, sizeof(int), 1, infile);
+    
     BitReader* br = BitReader__new(infile);
     FreqNode* tree = read_tree(br);
+    fprintf(stderr, "DES\n");
     BitReader__destroy(br);
-
+    fprintf(stderr, "DES END\n");
+    
+    fprintf(stderr, "f_pos = %d\n", ftell(infile));
     decode_data(tree, infile, infile_size, outfile);
 
     free_tree(tree);

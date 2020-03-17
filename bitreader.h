@@ -17,6 +17,10 @@ typedef struct BitReader {
 // f should be opened in binary reading mode
 BitReader* BitReader__new(FILE* f);
 
-char BitReader__read_bit(BitReader* bw);
+char BitReader__read_bit(BitReader* br);
 
-void BitReader__destroy(BitReader* bw);
+int BitReader__read_byte(unsigned char* byte, BitReader* this);
+
+void BitReader__next_byte(BitReader* this);
+
+void BitReader__destroy(BitReader* br);

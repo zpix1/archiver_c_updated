@@ -104,11 +104,11 @@ void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
     CharCode c = { .code_length = 0 };
     fill_code_table(code_table, freq_tree, c);
 
-    // printf("[TEST] Code table:\n");
-    // for (int i = 0; i < BYTE_COUNT; i++) {
-    //     if (code_table[i].code_length != 0)
-    //     fprintf(stderr, "char=%1c: code=%s; code_len=%d\n", i, code_table[i].code, code_table[i].code_length);
-    // }
+    fprintf(stderr, "[TEST] Code table:\n");
+    for (int i = 0; i < BYTE_COUNT; i++) {
+        if (code_table[i].code_length != 0)
+        fprintf(stderr, "char=%1c: code=%s; code_len=%d\n", i, code_table[i].code, code_table[i].code_length);
+    }
 
     unsigned char* buffer = malloc(sizeof(char) * C_BUFFER_SIZE);
     int to_read = size;
@@ -193,7 +193,7 @@ void write_tree(FreqNode* freq_tree, BitWriter* bw) {
     // If it is a leaf, save the value
     if (flag == 1) {
         for (int i = 0; i < 8; i++) {
-            BitWriter__write_bit(bw, (freq_tree->c >> i) & 1);
+            BitWriter__write_bit(bw, (freq_tree->c >> (7-i)) & 1);
         }
     }
 
@@ -203,12 +203,13 @@ void write_tree(FreqNode* freq_tree, BitWriter* bw) {
 
 FreqNode* read_tree(BitReader* br) {
     
-    int value = 0;
+    char value = 0;
     unsigned char flag;
 
     //fread(&flag, sizeof(char), 1, fp);
-    // flag = (BitReader__read_bit(br) << 1) | BitReader__read_bit(br);
-    printf("flag=%d\n", BitReader__read_bit(br) );
+    flag = (BitReader__read_bit(br) << 1) | BitReader__read_bit(br);
+    // printf("flag=%d\n", flag);
+    // printf("flag=%d\n", BitReader__read_bit(br) );
     // printf("%d, %d \n", BitReader__read_bit(br), BitReader__read_bit(br));
     if (flag == 0) {
         return NULL;
