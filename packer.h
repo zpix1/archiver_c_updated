@@ -1,5 +1,9 @@
+#pragma once
+
 #include <stdlib.h>
 #include <stdio.h>
+
+unsigned long fsize(FILE* file);
 
 // Pack files to output_filename using huffman coding according to this file structure:
 // 4b (uint) - n - amount of files
@@ -16,6 +20,6 @@ int pack_files(char** filenames, size_t nfilenames, char* outfilename);
 int unpack_files(char* infilename, char* outdir);
 
 // Compress and write infile to given position of outfile
-int pack_file(FILE* infile, FILE* outfile);
+int pack_file(FILE* infile, FILE* outfile, int infile_size);
 
 int unpack_file(FILE* infile, FILE* outfile);

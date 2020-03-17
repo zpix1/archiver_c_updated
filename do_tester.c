@@ -4,11 +4,20 @@
 
 int main () {
     char mode;
-    scanf("%c\r\n", &mode);
-    if (mode == 'c') {
-        pack_file(stdin, stdout);
-    } else {
-        unpack_file(stdin, stdout);
+    FILE* infile = fopen("in.txt", "rb");
+    FILE* outfile = fopen("out.txt", "wb");
+    
+    fscanf(infile, "%c\r\n", &mode);
+    int fs = fsize(infile) - 3;
+    fseek(infile, 3, SEEK_SET);
+    if (fs != 0) {
+        if (mode == 'c') {
+            pack_file(infile, outfile, fs);
+        } else {
+            unpack_file(infile, outfile);
+        }
     }
+    fclose(infile);
+    fclose(outfile);
     return 0;
 }

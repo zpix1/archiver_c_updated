@@ -17,6 +17,7 @@ char BitReader__read_bit(BitReader* this) {
             fread(this->buffer, sizeof(char), BR_BUFFER_SIZE, this->f);
         this->buffer_offset = 0;
     }
+    printf("ss=%d", this->max_buffer_size);
     if (this->max_buffer_size == 0) {
         return -1;
     }
