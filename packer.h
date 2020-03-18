@@ -5,8 +5,9 @@
 
 #define PATH_SEP '/'
 #define MAX_NFILENAMES 100000
+#define MAX_FILENAME_S 1000
 // new_filenames_ptr should be freed after use
-int create_filenames_list(char** filenames, size_t nfilenames, char** new_filenames_ptr, size_t* new_nfilenames) {
+size_t list_dir(const char* name, char** filenames, int offset);
 
 int isdir(const char* path);
 

@@ -3,21 +3,57 @@
 #include "bitwriter.h"
 #include "coder.h"
 
+#include <dirent.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-int create_filenames_list(char** filenames, size_t nfilenames, char** new_filenames_ptr, size_t* new_nfilenames) {
-    char** filenames = malloc(sizeof(char*) * MAX_NFILENAMES);
-    for (size_t i = 0; i < nfilenames; i++) {
+size_t list_dir(const char* name, char** filenames, int offset) {
+    DIR* dir;
+    struct dirent* entry;
 
+    if (!(dir = opendir(name))) {
+        fprintf(stderr, "error: can't open dir\n");
+        return 0;
     }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type == DT_DIR) {
+            char path[MAX_FILENAME_S];
+            if (strcmp(entry->d_name, ".") == 0 ||
+                strcmp(entry->d_name, "..") == 0)
+                continue;
+            snprintf(path, MAX_FILENAME_S, "%s/%s", name, entry->d_name);
+            
+            offset = list_dir(path, filenames, offset);
+        } else {
+            filenames[offset] = malloc(MAX_FILENAME_S);
+            snprintf(filenames[offset], MAX_FILENAME_S, "%s/%s", name, entry->d_name);
+            // printf("%s\n", filenames[offset]);
+            offset += 1;
+        }
+    }
+    closedir(dir);
+    return offset;
 }
 
-
-
+// int recursive_filenames_list(char** filenames, size_t nfilenames,
+//                              char** new_filenames_ptr,
+//                              size_t* new_nfilenames_ptr) {
+//     char** new_filenames = malloc(sizeof(char*) * MAX_NFILENAMES);
+//     size_t new_nfilenames = 0;
+//     for (size_t i = 0; i < nfilenames; i++) {
+//         if (!isdir(filenames[i])) {
+//             new_filenames[new_nfilenames] =
+//                 malloc(sizeof(char) * strlen(filenames[i]));
+//             strcpy(new_filenames[new_nfilenames], filenames[i]);
+//             new_nfilenames++;
+//         } else {
+//         }
+//     }
+// }
 
 int isdir(const char* path) {
     struct stat st;
@@ -25,7 +61,7 @@ int isdir(const char* path) {
         return 1;
     }
     stat(path, &st);
-    return S_ISDIR(st.st_mode) ? 0 : 1;
+    return S_ISDIR(st.st_mode) ? 1 : 0;
 }
 
 void rek_mkdir(char* path) {
