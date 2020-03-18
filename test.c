@@ -1,9 +1,11 @@
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "bitwriter.h"
 #include "bitreader.h"
 #include "coder.h"
+#include "packer.h"
 
 #define BWBR_TEST_SIZE 1000000
 
@@ -46,24 +48,36 @@ void test_bw_br() {
 }
 
 int main() {
-    FILE* f = fopen("infile.txt", "rb");
-    FILE* of = fopen("outfile.txt", "wb");
+    // FILE* f = fopen("infile.txt", "rb");
+    // FILE* of = fopen("outfile.txt", "wb");
 
-    const int infile_size = 78;
+    // const int infile_size = 78;
 
-    printf("[TEST] Generating code tree\n");
-    FreqNode* head = generate_code_tree(f, infile_size);
-    printf("[TEST] Encoding data\n");
-    encode_data(head, f, infile_size, of);
+    // printf("[TEST] Generating code tree\n");
+    // FreqNode* head = generate_code_tree(f, infile_size);
+    // printf("[TEST] Encoding data\n");
+    // encode_data(head, f, infile_size, of);
 
-    fclose(f);
-    fclose(of);
+    // fclose(f);
+    // fclose(of);
 
-    FILE* f1 = fopen("outfile.txt", "rb");
-    FILE* of1 = fopen("infile_dec.txt", "wb");
+    // FILE* f1 = fopen("outfile.txt", "rb");
+    // FILE* of1 = fopen("infile_dec.txt", "wb");
 
-    decode_data(head, f1, infile_size, of1);
+    // decode_data(head, f1, infile_size, of1);
 
-    free_tree(head);
+    // free_tree(head);
+
+    char* a[] = {
+        "coder.h",
+        "coder.c",
+        "bitreader.c"
+    };
+    printf("[TEST] Packing\n");
+    pack_files(a, 3, "outfile.bin");
+
+    printf("[TEST] Unpacking\n");
+    unpack_files("outfile.bin", "output_dir");
+    printf("[TEST] Done\n");
     return 0;
 }

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define PATH_SEP '/'
+
 unsigned long fsize(FILE* file);
 
 // Pack files to output_filename using huffman coding according to this file structure:
