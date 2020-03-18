@@ -3,11 +3,30 @@
 #include "bitwriter.h"
 #include "coder.h"
 
+#include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <errno.h>
+
+int create_filenames_list(char** filenames, size_t nfilenames, char** new_filenames_ptr, size_t* new_nfilenames) {
+    char** filenames = malloc(sizeof(char*) * MAX_NFILENAMES);
+    for (size_t i = 0; i < nfilenames; i++) {
+
+    }
+}
+
+
+
+
+int isdir(const char* path) {
+    struct stat st;
+    if (NULL == path) {
+        return 1;
+    }
+    stat(path, &st);
+    return S_ISDIR(st.st_mode) ? 0 : 1;
+}
 
 void rek_mkdir(char* path) {
     char* sep = strrchr(path, PATH_SEP);
@@ -17,7 +36,7 @@ void rek_mkdir(char* path) {
         *sep = PATH_SEP;
     }
     errno = 0;
-    if (!mkdir(path, 0755) && (errno == EACCES) ) {
+    if (!mkdir(path, 0755) && (errno == EACCES)) {
         printf("error while trying to create '%s'\n", path);
     }
 }
@@ -66,8 +85,7 @@ int pack_files(char** filenames, size_t nfilenames, char* outfilename) {
 
         FILE* current_f = fopen(filenames[i], "rb");
         if (current_f == NULL) {
-            fprintf(stderr, "%s can't be found, aborting\n",
-                    filenames[i]);
+            fprintf(stderr, "%s can't be found, aborting\n", filenames[i]);
             fclose(outfile);
             remove(outfilename);
             return 1;
