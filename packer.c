@@ -10,6 +10,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+char* strdup(const char* str) {
+    int n = strlen(str) + 1;
+    char* dup = malloc(n);
+    if (dup != NULL) {
+        strcpy(dup, str);
+    }
+    return dup;
+}
+
 size_t list_dir(const char* name, char** filenames, int offset) {
     DIR* dir;
     struct dirent* entry;
@@ -26,11 +35,12 @@ size_t list_dir(const char* name, char** filenames, int offset) {
                 strcmp(entry->d_name, "..") == 0)
                 continue;
             snprintf(path, MAX_FILENAME_S, "%s/%s", name, entry->d_name);
-            
+
             offset = list_dir(path, filenames, offset);
         } else {
             filenames[offset] = malloc(MAX_FILENAME_S);
-            snprintf(filenames[offset], MAX_FILENAME_S, "%s/%s", name, entry->d_name);
+            snprintf(filenames[offset], MAX_FILENAME_S, "%s/%s", name,
+                     entry->d_name);
             // printf("%s\n", filenames[offset]);
             offset += 1;
         }
@@ -38,22 +48,6 @@ size_t list_dir(const char* name, char** filenames, int offset) {
     closedir(dir);
     return offset;
 }
-
-// int recursive_filenames_list(char** filenames, size_t nfilenames,
-//                              char** new_filenames_ptr,
-//                              size_t* new_nfilenames_ptr) {
-//     char** new_filenames = malloc(sizeof(char*) * MAX_NFILENAMES);
-//     size_t new_nfilenames = 0;
-//     for (size_t i = 0; i < nfilenames; i++) {
-//         if (!isdir(filenames[i])) {
-//             new_filenames[new_nfilenames] =
-//                 malloc(sizeof(char) * strlen(filenames[i]));
-//             strcpy(new_filenames[new_nfilenames], filenames[i]);
-//             new_nfilenames++;
-//         } else {
-//         }
-//     }
-// }
 
 int isdir(const char* path) {
     struct stat st;
@@ -149,19 +143,30 @@ int unpack_files(char* infilename, char* outdir) {
     size_t outdir_s = strlen(outdir);
 
     size_t nfilenames;
-    fread(&nfilenames, sizeof(size_t), 1, infile);
+    size_t read = fread(&nfilenames, sizeof(size_t), 1, infile);
+
+    if (read != 1) {
+        fclose(infile);
+        return 1;
+    }
 
     printf("%zu files found in %s\n", nfilenames, infilename);
 
     for (size_t i = 0; i < nfilenames; i++) {
         size_t filename_s;
-        fread(&filename_s, sizeof(size_t), 1, infile);
+        size_t read = fread(&filename_s, sizeof(size_t), 1, infile);
+        if (read != 1) {
+            return 1;
+        }
 
         char filename[filename_s + outdir_s + 1];
         strcpy(filename, outdir);
         filename[outdir_s] = PATH_SEP;
-        fread(filename + outdir_s + 1, sizeof(unsigned char), filename_s,
-              infile);
+        read = fread(filename + outdir_s + 1, sizeof(unsigned char), filename_s,
+                     infile);
+        if (read != filename_s) {
+            return 1;
+        }
         filename[outdir_s + filename_s + 1] = '\0';
 
         printf("decompressing %s\n", filename);
@@ -196,8 +201,10 @@ int pack_file(FILE* infile, FILE* outfile, unsigned int infile_size) {
 
 int unpack_file(FILE* infile, FILE* outfile) {
     unsigned int infile_size;
-    fread(&infile_size, sizeof(unsigned int), 1, infile);
-
+    size_t read = fread(&infile_size, sizeof(unsigned int), 1, infile);
+    if (read != 1) {
+        return 1;
+    }
     BitReader* br = BitReader__new(infile);
     FreqNode* tree = read_tree(br);
     BitReader__destroy(br);

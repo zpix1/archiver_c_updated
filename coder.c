@@ -131,8 +131,6 @@ void encode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
 void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) {
     unsigned char* buffer = malloc(sizeof(char) * C_BUFFER_SIZE);
     int to_write = size;
-    size_t buffer_i = 0;
-    size_t counter = 0;
 
     FreqNode* current_node = freq_tree;
     if (current_node->one_node == NULL) {
@@ -142,6 +140,8 @@ void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
             to_write -= C_BUFFER_SIZE;
         }
     } else {
+        size_t buffer_i = 0;
+        size_t counter = 0;
         BitReader* br = BitReader__new(infile);
         while (counter < size) {
             char bit = BitReader__read_bit(br);
@@ -158,7 +158,7 @@ void decode_data(FreqNode* freq_tree, FILE* infile, size_t size, FILE* outfile) 
                 current_node = freq_tree;
                 counter++;
                 buffer_i++;
-                if (buffer_i == min(to_write, C_BUFFER_SIZE)) {
+                if (buffer_i == (size_t)min(to_write, C_BUFFER_SIZE)) {
                     to_write -= buffer_i;
                     fwrite(buffer, sizeof(char), buffer_i, outfile);
                     buffer_i = 0;

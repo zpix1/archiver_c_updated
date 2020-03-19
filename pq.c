@@ -18,7 +18,7 @@ void push(heap_t* h, int priority, FreqNode* data) {
 }
 
 FreqNode* pop(heap_t* h) {
-    int i, j, k;
+    int i;
     if (!h->len) {
         return NULL;
     }
@@ -30,6 +30,7 @@ FreqNode* pop(heap_t* h) {
 
     i = 1;
     while (i != h->len + 1) {
+        int j, k;
         k = h->len + 1;
         j = 2 * i;
         if (j <= h->len && h->nodes[j].priority < h->nodes[k].priority) {

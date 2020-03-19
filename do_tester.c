@@ -7,7 +7,11 @@ int main () {
     FILE* infile = fopen("in.txt", "rb");
     FILE* outfile = fopen("out.txt", "wb");
     
-    fscanf(infile, "%c\r\n", &mode);
+    if (fscanf(infile, "%c\r\n", &mode) != 1) {
+        fclose(infile);
+        fclose(outfile);
+        return 1;
+    }
     int fs = fsize(infile) - 3;
     fseek(infile, 3, SEEK_SET);
     if (fs != 0) {

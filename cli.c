@@ -10,8 +10,6 @@ void usage() {
 }
 
 int main(int argc, char** argv) {
-    char* filenames[1000];
-    list_dir(".", filenames, 0);
 
     if (argc < 3) {
         fprintf(stderr, "error: not enough aruments, check usage\n");
