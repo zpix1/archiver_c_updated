@@ -7,11 +7,13 @@
 #define MAX_NFILENAMES 100000
 #define MAX_FILENAME_S 1000
 
-// new_filenames_ptr should be freed after use
+// filenames should be freed after use
 size_t list_dir(const char* name, char** filenames, int offset);
 
+// Check if given path is a directory
 int isdir(const char* path);
 
+// Return file size of given file (only for files <= 2GB)
 unsigned long fsize(FILE* file);
 
 // Pack files to output_filename using huffman coding according to this file

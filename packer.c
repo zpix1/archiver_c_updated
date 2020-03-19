@@ -41,11 +41,12 @@ size_t list_dir(const char* name, char** filenames, int offset) {
             filenames[offset] = malloc(MAX_FILENAME_S);
             snprintf(filenames[offset], MAX_FILENAME_S, "%s/%s", name,
                      entry->d_name);
-            // printf("%s\n", filenames[offset]);
+
             offset += 1;
         }
     }
     closedir(dir);
+    
     return offset;
 }
 
